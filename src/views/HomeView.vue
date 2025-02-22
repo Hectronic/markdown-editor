@@ -1,12 +1,15 @@
 <!-- src/views/HomeView.vue -->
 <template>
     <div>
-      <Header
+        <Header
         :editing="!!editingId"
+        :editingId="editingId"
+        :historyVersion="historyVersion"
         @nuevo="handleNuevo"
         @guardar="handleGuardar"
         @guardar-copia="handleGuardarCopia"
-      />
+        @cargar-entrada="handleCargarEntrada"
+        />
       <div class="container">
         <div class="column">
           <MarkdownEditor v-model="markdownText" />
@@ -28,8 +31,14 @@
   
   Escribe **Markdown** y visualiza el resultado en tiempo real.`)
   
-  // Si se carga una entrada del historial, se guarda su id para edición.
   const editingId = ref(null)
+  const historyVersion = ref(0) // Variable reactiva para notificar cambios en el historial
+  
+  // Función para actualizar el historial en localStorage y notificar la actualización.
+  const updateHistoryStorage = (history) => {
+    localStorage.setItem('historyMarkdowns', JSON.stringify(history))
+    historyVersion.value++  // Incrementa para que el Header actualice sus entradas
+  }
   
   // Al montar la vista, si hay una entrada seleccionada se carga en el editor.
   onMounted(() => {
@@ -72,7 +81,7 @@
           updatedAt: now
         })
       }
-      localStorage.setItem('historyMarkdowns', JSON.stringify(history))
+      updateHistoryStorage(history)
     }
     // Limpia el editor y resetea el modo de edición.
     markdownText.value = ''
@@ -102,7 +111,7 @@
         })
         editingId.value = newId
       }
-      localStorage.setItem('historyMarkdowns', JSON.stringify(history))
+      updateHistoryStorage(history)
     }
   }
   
@@ -117,8 +126,14 @@
         createdAt: now,
         updatedAt: now
       })
-      localStorage.setItem('historyMarkdowns', JSON.stringify(history))
+      updateHistoryStorage(history)
     }
+  }
+  
+  // Función para cargar una entrada en el editor (evento "cargar-entrada" desde Header).
+  const handleCargarEntrada = (text, id) => {
+    markdownText.value = text
+    editingId.value = id
   }
   </script>
   
