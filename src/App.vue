@@ -8,5 +8,9 @@
 </script>
 
 <style scoped>
-/* Puedes agregar estilos globales o específicos aquí */
-</style>
+  :global(html, body) {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  </style>

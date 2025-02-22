@@ -1,7 +1,7 @@
 <!-- src/views/HomeView.vue -->
 <template>
     <div>
-        <Header
+      <Header
         :editing="!!editingId"
         :editingId="editingId"
         :historyVersion="historyVersion"
@@ -9,7 +9,7 @@
         @guardar="handleGuardar"
         @guardar-copia="handleGuardarCopia"
         @cargar-entrada="handleCargarEntrada"
-        />
+      />
       <div class="container">
         <div class="column">
           <MarkdownEditor v-model="markdownText" />
@@ -31,13 +31,14 @@
   
   Escribe **Markdown** y visualiza el resultado en tiempo real.`)
   
+  // Si se carga una entrada del historial, se guarda su id para edición.
   const editingId = ref(null)
-  const historyVersion = ref(0) // Variable reactiva para notificar cambios en el historial
+  const historyVersion = ref(0) // Para notificar cambios en el historial
   
   // Función para actualizar el historial en localStorage y notificar la actualización.
   const updateHistoryStorage = (history) => {
     localStorage.setItem('historyMarkdowns', JSON.stringify(history))
-    historyVersion.value++  // Incrementa para que el Header actualice sus entradas
+    historyVersion.value++
   }
   
   // Al montar la vista, si hay una entrada seleccionada se carga en el editor.
@@ -73,7 +74,7 @@
           })
         }
       } else {
-        // Crea una nueva entrada con id autogenerado y fechas.
+        // Crea una nueva entrada.
         history.push({
           id: Date.now().toString(),
           text: markdownText.value,
@@ -137,19 +138,27 @@
   }
   </script>
   
-  <style scoped>
+  <style scoped>  
+  /* El contenedor se sitúa justo debajo del header fijo (70px) y ocupa el alto restante */
   .container {
-    display: flex;
+    margin-top: 70px;
     height: calc(100vh - 70px);
+    display: flex;
     overflow: hidden;
   }
+  
+  /* Las columnas permiten scroll solo si su contenido excede el alto disponible */
   .column {
     flex: 1;
     padding: 1rem;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
+  }
+  body {
+    margin: 0;
+    padding: 0;
     overflow: hidden;
   }
   </style>
+  
   

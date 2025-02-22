@@ -20,7 +20,10 @@
             @click="loadEntry(entry)"
           >
             <p class="snippet">{{ entry.text.slice(0, 20) }}...</p>
-            <small>{{ new Date(entry.updatedAt).toLocaleDateString() }}</small>
+            <small>
+                <div>{{ new Date(entry.updatedAt).toLocaleDateString() }}</div>
+                <div class="time">{{ new Date(entry.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</div>
+            </small>
           </div>
           <!-- Último cuadrado: enlace al historial completo -->
           <div class="carousel-item history-link" @click="goToHistory">
@@ -100,15 +103,21 @@
   </script>
   
   <style scoped>
+  /* Fijamos el header en la parte superior con un alto fijo */
   .app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #42b983;
     color: #fff;
-    padding: 1rem;
-    flex-wrap: nowrap;
-    overflow: hidden;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    z-index: 1000;
   }
   
   .left-section {
@@ -159,6 +168,7 @@
     gap: 0.5rem;
   }
   
+  /* Todas las tarjetas tendrán un borde de 3px (transparente por defecto) para evitar cambios de tamaño */
   .carousel-item {
     background: #fff;
     color: #42b983;
@@ -167,13 +177,14 @@
     padding: 0.5rem;
     border-radius: 8px;
     cursor: pointer;
-    border: 1px solid #42b983;
+    border: 3px solid transparent;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.2s, background-color 0.2s, border 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
   }
   
   .carousel-item:hover {
@@ -181,8 +192,9 @@
     background: #f0f0f0;
   }
   
+  /* Tarjeta seleccionada: resalta con un borde de color verde oscuro */
   .carousel-item.selected {
-    border: 3px solid #2e7d32; /* Verde más oscuro, marco más ancho */
+    border-color: #2e7d32;
   }
   
   .snippet {
@@ -192,12 +204,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: 100%;
+    box-sizing: border-box;
   }
+
   
-  /* Estilo para el último cuadrado (enlace al historial completo) */
+  /* Último cuadrado: enlace al historial completo */
   .history-link {
     background-color: #42b983;
-    border: 1px solid #fff;
+    border: 3px solid #fff;
   }
   
   .history-link .link-text {
@@ -206,6 +221,11 @@
     margin: 0;
     font-size: 0.8rem;
     text-align: center;
+  }
+
+  .time {
+    font-size: 0.6rem;
+    margin-top: 2px;
   }
   </style>
   
