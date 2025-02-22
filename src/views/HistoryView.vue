@@ -5,6 +5,10 @@
     <ul>
       <li v-for="entry in history" :key="entry.id">
         <pre>{{ entry.text }}</pre>
+        <div class="info">
+          <small>Creado: {{ formatDate(entry.createdAt) }}</small>
+          <small>Última Modificación: {{ formatDate(entry.updatedAt) }}</small>
+        </div>
         <div class="buttons">
           <button @click="viewEntry(entry.id)">Ver</button>
           <button @click="deleteEntry(entry.id)">Borrar</button>
@@ -43,6 +47,11 @@ const deleteEntry = (id) => {
   history.value = history.value.filter((entry) => entry.id !== id)
   localStorage.setItem('historyMarkdowns', JSON.stringify(history.value))
 }
+
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr)
+  return date.toLocaleString()
+}
 </script>
 
 <style scoped>
@@ -59,6 +68,13 @@ li {
   padding: 1rem;
   border-radius: 4px;
   white-space: pre-wrap;
+}
+.info {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
 }
 .buttons {
   margin-top: 0.5rem;

@@ -28,7 +28,7 @@
   
   Escribe **Markdown** y visualiza el resultado en tiempo real.`)
   
-  // Si se carga una entrada desde el historial, se guarda su id para edición.
+  // Si se carga una entrada del historial, se guarda su id para edición.
   const editingId = ref(null)
   
   // Al montar la vista, si hay una entrada seleccionada se carga en el editor.
@@ -43,22 +43,34 @@
     }
   })
   
-  // Función que guarda el contenido actual: si se está editando, actualiza; si no, crea una nueva entrada.
+  // Función que guarda o actualiza la entrada actual en el historial y limpia el editor.
   const handleNuevo = () => {
     const history = JSON.parse(localStorage.getItem('historyMarkdowns')) || []
     if (markdownText.value.trim() !== '') {
+      const now = new Date().toISOString()
       if (editingId.value) {
         // Actualiza la entrada existente.
         const index = history.findIndex(entry => entry.id == editingId.value)
         if (index !== -1) {
           history[index].text = markdownText.value
+          history[index].updatedAt = now
         } else {
-          // Si no se encuentra (por alguna inconsistencia), se crea una nueva.
-          history.push({ id: Date.now(), text: markdownText.value })
+          // Por si no se encuentra, se crea una nueva.
+          history.push({
+            id: Date.now().toString(),
+            text: markdownText.value,
+            createdAt: now,
+            updatedAt: now
+          })
         }
       } else {
-        // Crea una nueva entrada con un id autogenerado.
-        history.push({ id: Date.now(), text: markdownText.value })
+        // Crea una nueva entrada con id autogenerado y fechas.
+        history.push({
+          id: Date.now().toString(),
+          text: markdownText.value,
+          createdAt: now,
+          updatedAt: now
+        })
       }
       localStorage.setItem('historyMarkdowns', JSON.stringify(history))
     }
@@ -67,23 +79,44 @@
     editingId.value = null
   }
   
-  // Función para actualizar la entrada actual sin limpiar el editor.
+  // Función para guardar (crear o actualizar) la entrada actual sin limpiar el editor.
   const handleGuardar = () => {
-    if (editingId.value && markdownText.value.trim() !== '') {
+    if (markdownText.value.trim() !== '') {
+      const now = new Date().toISOString()
       const history = JSON.parse(localStorage.getItem('historyMarkdowns')) || []
-      const index = history.findIndex(entry => entry.id == editingId.value)
-      if (index !== -1) {
-        history[index].text = markdownText.value
-        localStorage.setItem('historyMarkdowns', JSON.stringify(history))
+      if (editingId.value) {
+        // Si ya existe un id, actualiza la entrada existente.
+        const index = history.findIndex(entry => entry.id == editingId.value)
+        if (index !== -1) {
+          history[index].text = markdownText.value
+          history[index].updatedAt = now
+        }
+      } else {
+        // Si no existe id, crea una nueva entrada y asigna su id a editingId.
+        const newId = Date.now().toString()
+        history.push({
+          id: newId,
+          text: markdownText.value,
+          createdAt: now,
+          updatedAt: now
+        })
+        editingId.value = newId
       }
+      localStorage.setItem('historyMarkdowns', JSON.stringify(history))
     }
   }
   
-  // Función para guardar una copia: guarda el contenido actual como una nueva entrada sin afectar la edición actual.
+  // Función para guardar una copia: crea una nueva entrada con el contenido actual.
   const handleGuardarCopia = () => {
     if (editingId.value && markdownText.value.trim() !== '') {
       const history = JSON.parse(localStorage.getItem('historyMarkdowns')) || []
-      history.push({ id: Date.now(), text: markdownText.value })
+      const now = new Date().toISOString()
+      history.push({
+        id: Date.now().toString(),
+        text: markdownText.value,
+        createdAt: now,
+        updatedAt: now
+      })
       localStorage.setItem('historyMarkdowns', JSON.stringify(history))
     }
   }
